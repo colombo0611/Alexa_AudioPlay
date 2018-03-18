@@ -1,8 +1,7 @@
 import os
 
 #再生する音楽のURL
-str_url = "https://s3-ap-northeast-1.amazonaws.com/for-alexa-kasikoma/n37.mp3"
-#str_url = "https://s3-ap-northeast-1.amazonaws.com/for-alexa-kasikoma/kashikoma_hen.mp3"
+str_url = "mp3File_URL"
 
 def launch_response():
 ########音楽再生をAlexaに伝える##########
