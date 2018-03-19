@@ -84,34 +84,37 @@ def null_response():
 
 ########何もしない#############
 def session_end_response(event):
-    print('デバック：' + f"{event['request']['type']}" + 'を受信しました')
-    print(f"{event['request']}")
+    print('デバック：' + event['request']['type'] + 'を受信しました')
+    print(event['request'])
 
-########main routine###########
+########mainの処理###########
 def lambda_handler(event, context):
 
+    AudioStart_IntentName = 'TestPlayIntent'
+
     if event['request']['type'] == 'LaunchRequest':
-        print('デバック：' + f"{event['request']['type']}" + 'を受信しました')
+        print('デバック：' + event['request']['type'] + 'を受信しました')
         print('音楽を再生します。')
-        print(f"{event['request']}")
+        print(event['request'])
         return launch_response()
 
-    elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == 'TestPlayIntent':
-        print('デバック：' + f"{event['request']['type']}" + 'を受信しました')
-        print(f"{event['request']}")
+    elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == AudioStart_IntentName:
+        print('デバック：' + event['request']['type'] + 'を受信しました')
+        print('音楽を再生します。')
+        print(event['request'])
         return intent_response()
 
     elif event['request']['type'] == 'SessionEndedRequest':
         return session_end_response(event)
 
     elif event['request']['type'] == 'AudioPlayer.PlaybackStarted' or event['request']['type'] == 'AudioPlayer.PlaybackStopped':
-        print('デバック：' + f"{event['request']['type']}" + 'を受信しました')
-        print(f"{event['request']}")
+        print('デバック：' + event['request']['type'] + 'を受信しました')
+        print(event['request'])
         return null_response()
         
     else:
-        print('デバック：' + f"{event['request']['type']}" + 'を受信しました')
-        print(f"{event['request']}")
+        print('デバック：' + event['request']['type'] + 'を受信しました')
+        print(event['request'])
         print('音楽を停止します。')
         return cancel_response()
 
