@@ -9,6 +9,15 @@ def launch_response():
         "version": "1.0",
         "sessionAttributes": {},
         "response": {
+            "outputSpeech": {
+                "type": "PlainText",
+                "text": "ピチピチボイスでライブスタート。"
+            },
+            "card": {
+                "title": "音楽再生テスト",
+                "content": "音楽再生を開始しました。",
+                "type": "Simple"
+            },
             "directives": [
                 {
                     "type": "AudioPlayer.Play",
@@ -34,6 +43,15 @@ def intent_response():
         "version": "1.0",
         "sessionAttributes": {},
         "response": {
+            "outputSpeech": {
+                "type": "PlainText",
+                "text": "ピチピチボイスでライブスタート。"
+            },
+            "card": {
+                "title": "音楽再生テスト",
+                "content": "音楽再生を開始しました。",
+                "type": "Simple"
+            },
             "directives": [
                 {
                     "type": "AudioPlayer.Play",
@@ -60,6 +78,15 @@ def cancel_response():
         "version": "1.0",
         "sessionAttributes": {},
         "response": {
+            "outputSpeech": {
+                "type": "PlainText",
+                "text": "ザ、ワールド"
+            },
+            "card": {
+                "title": "音楽再生テスト",
+                "content": "音楽再生を停止しました。",
+                "type": "Simple"
+            },
             "directives": [
                 {
                     "type": "AudioPlayer.Stop"
