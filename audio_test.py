@@ -4,7 +4,7 @@ import os
 str_url = "mp3File_URL"
 
 def launch_response():
-########音楽再生をAlexaに伝える##########
+########音楽再生を開始する##########
     response = {
         "version": "1.0",
         "sessionAttributes": {},
@@ -38,7 +38,7 @@ def launch_response():
 
 
 def intent_response():
-########音楽再生をAlexaに伝える##########
+########音楽再生を開始する##########
     response = {
         "version": "1.0",
         "sessionAttributes": {},
@@ -70,8 +70,25 @@ def intent_response():
     }
     return response
 
+#####音楽再生正常終了時の応答###################
+def finished_response():
 
-#####再生中の音楽を止める###################
+    response = {
+        "version": "1.0",
+        "sessionAttributes": {},
+        "response": {
+            "directives": [
+                {
+                    "type": "AudioPlayer.Stop"
+                }
+            ],
+            'shouldEndSession': True
+        }
+    }
+    return response
+
+
+#####再生中の音楽を止める(ユーザ途中キャンセル)###################
 def cancel_response():
 
     response = {
@@ -134,10 +151,27 @@ def lambda_handler(event, context):
     elif event['request']['type'] == 'SessionEndedRequest':
         return session_end_response(event)
 
-    elif event['request']['type'] == 'AudioPlayer.PlaybackStarted' or event['request']['type'] == 'AudioPlayer.PlaybackStopped':
+    ###以下はユーザからの発話処理とは無関係なAudioPlayリクエストの処理####
+
+    elif event['request']['type'] == 'AudioPlayer.PlaybackStarted':
         print('デバック：' + event['request']['type'] + 'を受信しました')
         print(event['request'])
         return null_response()
+
+    elif event['request']['type'] == 'AudioPlayer.PlaybackStopped':
+        print('デバック：' + event['request']['type'] + 'を受信しました')
+        print(event['request'])
+        return null_response()
+
+    elif event['request']['type'] == 'AudioPlayer.PlaybackNearlyFinished':
+        print('デバック：' + event['request']['type'] + 'を受信しました')
+        print(event['request'])
+        return null_response()
+
+    elif event['request']['type'] == 'AudioPlayer.PlaybackFinished':
+        print('デバック：' + event['request']['type'] + 'を受信しました')
+        print(event['request'])
+        return finished_response()
         
     else:
         print('デバック：' + event['request']['type'] + 'を受信しました')
