@@ -256,7 +256,7 @@ def session_end_response(event):
 
 
 #####リモンコンによる再生中の音楽を停止(ユーザ途中一時停止)###################
-def pause_response():
+def remote_pause_response():
 
     response = {
         "version": "1.0",
@@ -273,7 +273,7 @@ def pause_response():
     return response
 
 
-def rerestart_response(offset):
+def remote_start_response(offset):
 ########リモコンで音楽再生を再開する##########
     response = {
         "version": "1.0",
@@ -352,7 +352,7 @@ def lambda_handler(event, context):
 
     elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == 'PlayCommandIssued':
         offset = event['context']['AudioPlayer']['offsetInMilliseconds']
-        return remote_pause_response(offset)
+        return remote_start_response(offset)
         
         
 
