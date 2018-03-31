@@ -2,7 +2,7 @@ import os
 
 #再生する音楽のURL
 #魔王魂
-str_url = "play_mp3file(ex.https://example.org/test.mp3)"
+str_url = "music_URL(ex.https://example.org/hoge.mp3)"
 
 #####ヘルプを起動する###################
 def help_response():
@@ -176,8 +176,6 @@ def restart_response(offset):
     return response
 
 
-
-
 #####再生中の音楽を終了(ユーザ途中キャンセル)###################
 def cancel_response():
 
@@ -204,7 +202,42 @@ def cancel_response():
     }
     return response
 
-########特になも指定しない応答#########
+########対応する必要のないリクエストは音楽再生を再開する##########
+def cannot_request_response(offset):
+
+    response = {
+        "version": "1.0",
+        "sessionAttributes": {},
+        "response": {
+            "outputSpeech": {
+                "type": "PlainText",
+                "text": "すみません。天空のカウントダウンは対応していません。"
+            },
+            "card": {
+                "title": "天空のカウントダウン",
+                "content": "天空のカウントダウンを再開します。(出典；魔王魂3曲)",
+                "type": "Simple"
+            },
+            "directives": [
+                {
+                    "type": "AudioPlayer.Play",
+                    "playBehavior": "REPLACE_ALL",
+                    "audioItem": {
+                        "stream": {
+                            "token": "12345",
+                            "url": str_url,
+                            "offsetInMilliseconds": offset
+                        }
+                    }
+                }
+            ],
+            "shouldEndSession": True
+        }
+    }
+    return response
+
+
+########エラー回避用のレスポンス#########
 def null_response():
     response = {
         "version": "1.0",
@@ -222,65 +255,120 @@ def session_end_response(event):
     print(event['request'])
 
 
+#####リモンコンによる再生中の音楽を停止(ユーザ途中一時停止)###################
+def pause_response():
+
+    response = {
+        "version": "1.0",
+        "sessionAttributes": {},
+        "response": {
+            "directives": [
+                {
+                    "type": "AudioPlayer.Stop"
+                }
+            ],
+            'shouldEndSession': True
+        }
+    }
+    return response
+
+
+def rerestart_response(offset):
+########リモコンで音楽再生を再開する##########
+    response = {
+        "version": "1.0",
+        "sessionAttributes": {},
+        "response": {
+            "directives": [
+                {
+                    "type": "AudioPlayer.Play",
+                    "playBehavior": "REPLACE_ALL",
+                    "audioItem": {
+                        "stream": {
+                            "token": "12345",
+                            "url": str_url,
+                            "offsetInMilliseconds": offset
+                        }
+                    }
+                }
+            ],
+            "shouldEndSession": True
+        }
+    }
+    return response
+
+
 ########mainの処理###########
 def lambda_handler(event, context):
-
     AudioStart_IntentName = 'TimerStartIntent'
 
     if event['request']['type'] == 'LaunchRequest':
-        print('音楽を再生します。')
         print('デバック：' + event['request']['type'] + 'を受信しました')
+        print('音楽を再生します。')
         print(event['request'])
         return launch_response()
 
     elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == AudioStart_IntentName:
-        print('音楽を再生します。')
         print('デバック：' + event['request']['type'] + 'を受信しました')
+        print('音楽を再生します。')
         print(event['request'])
         return intent_response()
 
     elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == 'AMAZON.HelpIntent':
-        print('ヘルプを起動しました。')
         print('デバック：' + event['request']['type'] + 'を受信しました')
+        print('ヘルプを起動しました。')
         print(event['request'])
         return help_response()
         
     elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == 'AMAZON.PauseIntent':
-        print('一時停止します。')
         print('デバック：' + event['request']['type'] + 'を受信しました')
+        print('一時停止します。')
         print(event['request'])
         print(event['context'])
         return pause_response()
 
     elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == 'AMAZON.ResumeIntent':
-        print('再開します')
         print('デバック：' + event['request']['type'] + 'を受信しました')
+        print('再開します')
         print(event['request'])
         print(event['context'])
         offset = event['context']['AudioPlayer']['offsetInMilliseconds']
         return restart_response(offset)
-        
+
+    elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == 'AMAZON.CancelIntent':
+        print('デバック：' + event['request']['type'] + 'を受信しました')
+        print(event['request'])
+        print('音楽を終了します')
+        return cancel_response()
+
         
     elif event['request']['type'] == 'SessionEndedRequest':
         print('ユーザからの応答がありませんでした')
         return session_end_response(event)
+    
+    ###リモンによる操作    
+    elif event['request']['type'] == 'PlaybackController.PauseCommandIssued':
+        return remote_pause_response()
+
+    elif event['request']['type'] == 'IntentRequest' and event['request']['intent']['name'] == 'PlayCommandIssued':
+        offset = event['context']['AudioPlayer']['offsetInMilliseconds']
+        return remote_pause_response(offset)
+        
+        
 
     ###以下はユーザからの発話処理とは無関係なAudioPlayリクエストの処理####
 
     elif event['request']['type'] == 'AudioPlayer.PlaybackStarted':
-        print('音楽再生中')
         print('デバック：' + event['request']['type'] + 'を受信しました')
         print(event['request'])
         return null_response()
 
     elif event['request']['type'] == 'AudioPlayer.PlaybackStopped':
-        print('音楽再生停止')
         print('デバック：' + event['request']['type'] + 'を受信しました')
         print(event['request'])
         return null_response()
 
     elif event['request']['type'] == 'AudioPlayer.PlaybackNearlyFinished':
-        print('音楽再生終了')
         print('デバック：' + event['request']['type'] + 'を受信しました')
         print(event['request'])
         return null_response()
@@ -293,8 +381,9 @@ def lambda_handler(event, context):
     else:
         print('デバック：' + event['request']['type'] + 'を受信しました')
         print(event['request'])
-        print('音楽を終了します')
-        return cancel_response()
+        print('対応する必要のないリクエスト')
+        offset = event['context']['AudioPlayer']['offsetInMilliseconds']
+        return cannot_request_response(offset)
 
 
 
