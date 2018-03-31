@@ -1,3 +1,4 @@
+#テスト用で作ったやつ。sky_timer.pyに以降。
 import os
 
 #再生する音楽のURL
